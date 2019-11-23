@@ -18,10 +18,12 @@
 //! use async_std::io::{self, BufReader, prelude::*};
 //! use duplexify::Duplex;
 //!
+//! // Create a reader and writer, and merge them into a single "duplex".
 //! let stdin = BufReader::new(io::stdin());
 //! let stdout = io::stdout();
 //! let mut stdio = Duplex::new(stdin, stdout);
 //!
+//! // We can now read + write from and to the duplex.
 //! let mut line = String::new();
 //! stdio.read_line(&mut line).await?;
 //! stdio.write_all(&line.as_bytes()).await?;
