@@ -1,5 +1,12 @@
 //! Combine a reader + writer into a duplex of Read + Write.
 //!
+//! This is useful when you need a reader + writer, but it doesn't come neatly
+//! pre-packaged. This allows wiring it together with minimal effort.
+//! See also: [`io::empty`], [`io::sink`].
+//!
+//! [`io::empty`]: https://docs.rs/async-std/1.1.0/async_std/io/fn.empty.html
+//! [`io::sink`]: https://docs.rs/async-std/1.1.0/async_std/io/fn.sink.html
+//!
 //! # Examples
 //!
 //! Read a line from stdin, and write it to stdout. All from the same `stdio`
