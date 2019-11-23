@@ -1,0 +1,19 @@
+[package]
+name = "duplexify"
+version = "1.0.0"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/async-rs/duplexify"
+documentation = "https://docs.rs/duplexify"
+description = "Combine a reader + writer into a duplex of Read + Write."
+keywords = ["duplex", "stream", "async", "futures", "io"]
+categories = ["asynchronous", "development-tools", "filesystem", "os"]
+authors = ["Yoshua Wuyts <yoshuawuyts@gmail.com>"]
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+async-std = { version = "1.1.0", default-features = false, features = ["std"] }
+pin-project-lite = "0.1.1"
+
+[dev-dependencies]
+async-std = "1.1.0"

@@ -1,0 +1,95 @@
+//! Combine a reader + writer into a duplex of Read + Write.
+//!
+//! # Examples
+//!
+//! Read a line from stdin, and write it to stdout. All from the same `stdio`
+//! object:
+//!
+//! ```no_run
+//! # fn main() -> std::io::Result<()> { async_std::task::block_on(async {
+//! #
+//! use async_std::io::{self, BufReader, prelude::*};
+//! use duplexify::Duplex;
+//!
+//! let stdin = BufReader::new(io::stdin());
+//! let stdout = io::stdout();
+//! let mut stdio = Duplex::new(stdin, stdout);
+//!
+//! let mut line = String::new();
+//! stdio.read_line(&mut line).await?;
+//! stdio.write_all(&line.as_bytes()).await?;
+//! #
+//! # Ok(()) }) }
+//! ```
+
+#![forbid(unsafe_code, rust_2018_idioms)]
+#![deny(missing_debug_implementations, nonstandard_style)]
+#![warn(missing_docs, missing_doc_code_examples, unreachable_pub)]
+
+use async_std::io::{self, BufRead, Read, Write};
+use async_std::task::{Context, Poll};
+use std::pin::Pin;
+
+pin_project_lite::pin_project! {
+    /// Combine a reader + writer into a duplex of `Read` + `Write`.
+    #[derive(Debug)]
+    pub struct Duplex<R, W> {
+        #[pin]
+        reader: R,
+        #[pin]
+        writer: W,
+    }
+}
+
+impl<R, W> Duplex<R, W> {
+    /// Create a new instance.
+    pub fn new(reader: R, writer: W) -> Self {
+        Self {
+            reader: reader,
+            writer: writer,
+        }
+    }
+}
+
+impl<R: Read, W> Read for Duplex<R, W> {
+    fn poll_read(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut [u8],
+    ) -> Poll<io::Result<usize>> {
+        let this = self.project();
+        this.reader.poll_read(cx, buf)
+    }
+}
+
+impl<R, W: Write> Write for Duplex<R, W> {
+    fn poll_write(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &[u8],
+    ) -> Poll<io::Result<usize>> {
+        let this = self.project();
+        this.writer.poll_write(cx, buf)
+    }
+
+    fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        let this = self.project();
+        this.writer.poll_flush(cx)
+    }
+
+    fn poll_close(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        let this = self.project();
+        this.writer.poll_close(cx)
+    }
+}
+
+impl<R: BufRead, W> BufRead for Duplex<R, W> {
+    fn poll_fill_buf(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<&[u8]>> {
+        let this = self.project();
+        this.reader.poll_fill_buf(cx)
+    }
+    fn consume(self: Pin<&mut Self>, amt: usize) {
+        let this = self.project();
+        this.reader.consume(amt)
+    }
+}
