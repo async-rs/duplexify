@@ -58,6 +58,11 @@ impl<R, W> Duplex<R, W> {
             writer: writer,
         }
     }
+
+    /// Decomposes a duplex into its components.
+    pub fn into_inner(self) -> (R, W) {
+        (self.reader, self.writer)
+    }
 }
 
 impl<R: Read, W> Read for Duplex<R, W> {
