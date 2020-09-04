@@ -1,6 +1,6 @@
-use async_std::io::{self, BufReader, prelude::*};
-use duplexify::Duplex;
+use async_std::io::{self, prelude::*, BufReader};
 use async_std::task;
+use duplexify::Duplex;
 
 fn main() -> std::io::Result<()> {
     task::block_on(async {

@@ -53,10 +53,7 @@ pin_project_lite::pin_project! {
 impl<R, W> Duplex<R, W> {
     /// Create a new instance.
     pub fn new(reader: R, writer: W) -> Self {
-        Self {
-            reader: reader,
-            writer: writer,
-        }
+        Self { reader, writer }
     }
 
     /// Decomposes a duplex into its components.
@@ -105,5 +102,18 @@ impl<R: BufRead, W> BufRead for Duplex<R, W> {
     fn consume(self: Pin<&mut Self>, amt: usize) {
         let this = self.project();
         this.reader.consume(amt)
+    }
+}
+
+impl<R, W> Clone for Duplex<R, W>
+where
+    R: Clone,
+    W: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            reader: self.reader.clone(),
+            writer: self.writer.clone(),
+        }
     }
 }
