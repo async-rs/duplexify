@@ -31,9 +31,14 @@
 //! # Ok(()) }) }
 //! ```
 
-#![forbid(unsafe_code, rust_2018_idioms)]
+#![forbid(unsafe_code)]
 #![deny(missing_debug_implementations, nonstandard_style)]
-#![warn(missing_docs, missing_doc_code_examples, unreachable_pub)]
+#![warn(
+    missing_docs,
+    missing_doc_code_examples,
+    unreachable_pub,
+    rust_2018_idioms
+)]
 
 use async_std::io::{self, BufRead, Read, Write};
 use async_std::task::{Context, Poll};
